@@ -14,5 +14,5 @@ endfunction()
 
 function(pluginval_display_version)
     pluginval_version(PLUGINVAL_VERSION)
-    message(STATUS "Plugin version output : ${PLUGINVAL_VERSION}")
+    message(STATUS "Pluginval version detected : ${PLUGINVAL_VERSION}")
 endfunction()
