@@ -1,0 +1,16 @@
+name: Formatting
+
+on: [push]
+
+jobs:
+  format:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cmake_format
+      run: |
+        pip install cmake-format
+    - name: checks the code formatting
+      run: |
+        cmake-format -i module/pluginval.cmake
+        git diff --exit-code
