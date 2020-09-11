@@ -1,3 +1,21 @@
+function(pluginval_is_installed output_var)
+  unset(PLUGINVAL_EXECUTABLE CACHE)
+  find_program(
+    PLUGINVAL_EXECUTABLE
+    NAMES pluginval pluginval.exe PATH C:/ProgramData/chocolatey/bin/pluginval
+    DOC "PluginVal executable string")
+
+  if(NOT PLUGINVAL_EXECUTABLE)
+    set(${output_var}
+        FALSE
+        PARENT_SCOPE)
+  else()
+    set(${output_var}
+        TRUE
+        PARENT_SCOPE)
+  endif()
+endfunction()
+
 function(pluginval_version output_var)
   # Runs the command to get the pluginval version
   execute_process(COMMAND pluginval --version
