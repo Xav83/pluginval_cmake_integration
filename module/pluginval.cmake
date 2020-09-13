@@ -1,4 +1,30 @@
+function(pluginval_is_installed output_var)
+  unset(PLUGINVAL_EXECUTABLE CACHE)
+  find_program(
+    PLUGINVAL_EXECUTABLE
+    NAMES pluginval pluginval.exe PATH C:/ProgramData/chocolatey/bin/pluginval
+    DOC "PluginVal executable string")
+
+  if(NOT PLUGINVAL_EXECUTABLE)
+    set(${output_var}
+        FALSE
+        PARENT_SCOPE)
+  else()
+    set(${output_var}
+        TRUE
+        PARENT_SCOPE)
+  endif()
+endfunction()
+
 function(pluginval_version output_var)
+  pluginval_is_installed(IS_PLUGINVAL_INSTALLED)
+  if(NOT ${IS_PLUGINVAL_INSTALLED})
+    message(
+      FATAL_ERROR
+        "Pluginval must be installed on the machine! You can use one of the installation instruction here -> https://github.com/Tracktion/pluginval#installation"
+    )
+  endif()
+
   # Runs the command to get the pluginval version
   execute_process(COMMAND pluginval --version
                   OUTPUT_VARIABLE PLUGINVAL_VERSION_RAW_OUTPUT)
@@ -19,6 +45,14 @@ function(pluginval_display_version)
 endfunction()
 
 function(pluginval_minimum_required)
+  pluginval_is_installed(IS_PLUGINVAL_INSTALLED)
+  if(NOT ${IS_PLUGINVAL_INSTALLED})
+    message(
+      FATAL_ERROR
+        "Pluginval must be installed on the machine! You can use one of the installation instruction here -> https://github.com/Tracktion/pluginval#installation"
+    )
+  endif()
+
   set(options FATAL_ERROR)
   set(oneValueArgs)
   set(multiValueArgs VERSION)
