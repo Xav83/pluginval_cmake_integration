@@ -10,7 +10,8 @@ jobs:
     - name: Install cmake_format
       run: |
         pip install cmake-format
-    - name: checks the code formatting
+    - name: Checks the code formatting
       run: |
         cmake-format -i module/pluginval.cmake
+        cmake-format -i tst/plugin_verification/CMakeLists.txt
         git diff --exit-code
