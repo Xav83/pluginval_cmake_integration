@@ -4,8 +4,10 @@ This repository is going to contain the integration of [pluginval](https://githu
 
 ## Requirements
 
-Pluginval must be installed on your machine to make the script work.
+- Pluginval must be installed on your machine to make the script work.
 You can found the installation protocole [here](https://github.com/Tracktion/pluginval#installation).
+
+- The minimal CMake version required is the version 3.18.2
 
 ## Documentation
 
@@ -34,5 +36,7 @@ _Usage:_ `pluginval_check_plugin(STRICTNESS_LEVEL <test_level_of_pluginval> VST_
 - [X] Run pluginval on a VST3
 - [X] Run pluginval on a AU
 
+- [ ] Checks some VST/VST3/AU (Dexed, ...) on the CI
 - [ ] Adds the ability to pass custom flags to pluginval
 - [ ] Checks the good behavior of the version detection on the CI
+- [ ] Adds ctest integration
