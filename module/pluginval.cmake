@@ -1,8 +1,15 @@
+set(PLUGINVAL_LOCATION
+    ""
+    CACHE PATH "Location of pluginval suggested by the user")
+
+message(STATUS "Location added : ${PLUGINVAL_LOCATION}")
+
 function(pluginval_is_installed output_var)
   unset(PLUGINVAL_EXECUTABLE CACHE)
   find_program(
     PLUGINVAL_EXECUTABLE
-    NAMES pluginval pluginval.exe PATH C:/ProgramData/chocolatey/bin/pluginval
+    NAMES pluginval pluginval.exe
+    HINTS ${PLUGINVAL_LOCATION} PATH C:/ProgramData/chocolatey/bin/pluginval
     DOC "PluginVal executable string")
 
   if(NOT PLUGINVAL_EXECUTABLE)
@@ -185,12 +192,23 @@ function(pluginval_check_plugin)
     )
   endif()
 
+  message("PLUGINVAL_EXECUTABLE : ${PLUGINVAL_EXECUTABLE}")
   execute_process(
     COMMAND
-      pluginval --strictness-level ${PLUGINVAL_CHECK_PLUGIN_STRICTNESS_LEVEL}
-      --validate ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION}
+      ${PLUGINVAL_EXECUTABLE} --strictness-level
+      ${PLUGINVAL_CHECK_PLUGIN_STRICTNESS_LEVEL} --validate
+      ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION}
     RESULT_VARIABLE PLUGINVAL_CHECK_PLUGIN_RESULT
-    OUTPUT_VARIABLE PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT)
+    OUTPUT_VARIABLE PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT
+    ERROR_VARIABLE PLUGINVAL_CHECK_PLUGIN_ERROR_OUTPUT)
+
+  message("PLUGINVAL_CHECK_PLUGIN_RESULT : ${PLUGINVAL_CHECK_PLUGIN_RESULT}")
+  message(
+    "PLUGINVAL_CHECK_PLUGIN_ERROR_OUTPUT : ${PLUGINVAL_CHECK_PLUGIN_ERROR_OUTPUT}"
+  )
+  message(
+    "PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT : ${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT}"
+  )
 
   string(STRIP ${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT}
                PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT)
