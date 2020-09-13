@@ -2,6 +2,11 @@
 
 This repository is going to contain the integration of [pluginval](https://github.com/Tracktion/pluginval) via [CMake](https://cmake.org/).
 
+## Requirements
+
+Pluginval must be installed on your machine to make the script work.
+You can found the installation protocole [here](https://github.com/Tracktion/pluginval#installation).
+
 ## Documentation
 
 ### pluginval_display_version
