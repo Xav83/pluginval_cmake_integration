@@ -135,3 +135,76 @@ function(pluginval_minimum_required)
     endif()
   endif()
 endfunction()
+
+function(pluginval_check_plugin)
+  pluginval_is_installed(IS_PLUGINVAL_INSTALLED)
+  if(NOT ${IS_PLUGINVAL_INSTALLED})
+    message(
+      FATAL_ERROR
+        "Pluginval must be installed on the machine! You can use one of the installation instruction here -> https://github.com/Tracktion/pluginval#installation"
+    )
+  endif()
+
+  set(options)
+  set(oneValueArgs STRICTNESS_LEVEL VST_LOCATION)
+  set(multiValueArgs)
+  cmake_parse_arguments(PLUGINVAL_CHECK_PLUGIN "${options}" "${oneValueArgs}"
+                        "${multiValueArgs}" ${ARGN})
+
+  if(NOT DEFINED PLUGINVAL_CHECK_PLUGIN_STRICTNESS_LEVEL)
+    message(
+      FATAL_ERROR
+        "No STRICTNESS_LEVEL passed to pluginval_check_plugin. Please add one to specify the level of the tests performed by pluginval."
+    )
+  endif()
+
+  if(NOT DEFINED PLUGINVAL_CHECK_PLUGIN_VST_LOCATION)
+    message(
+      FATAL_ERROR
+        "No VST_LOCATION passed to pluginval_minimum_required. Please add the path of the VST that you want to be checked by pluginval"
+    )
+  endif()
+
+  if(${PLUGINVAL_CHECK_PLUGIN_STRICTNESS_LEVEL} LESS_EQUAL 0
+     OR ${PLUGINVAL_CHECK_PLUGIN_STRICTNESS_LEVEL} GREATER 10)
+    message(
+      FATAL_ERROR "The STRICTNESS_LEVEL must be a value in the range [1, 10].")
+  endif()
+
+  if(IS_DIRECTORY ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION})
+    message(
+      FATAL_ERROR
+        "The VST_LOCATION must be a file, but a directory is passed to pluginval_check_plugin (${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION})."
+    )
+  endif()
+
+  if(NOT EXISTS ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION})
+    message(
+      FATAL_ERROR
+        "The VST_LOCATION must be an existing file, but \"${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION}\" is not found."
+    )
+  endif()
+
+  execute_process(
+    COMMAND
+      pluginval --strictness-level ${PLUGINVAL_CHECK_PLUGIN_STRICTNESS_LEVEL}
+      --validate ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION}
+    RESULT_VARIABLE PLUGINVAL_CHECK_PLUGIN_RESULT
+    OUTPUT_VARIABLE PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT)
+
+  string(STRIP ${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT}
+               PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT)
+  string(FIND ${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT} "ALL TESTS PASSED"
+              ALL_TESTS_PASSED_STRING_POSITION REVERSE)
+
+  if(${PLUGINVAL_CHECK_PLUGIN_RESULT} EQUAL 1
+     OR ${ALL_TESTS_PASSED_STRING_POSITION} EQUAL -1)
+    message(
+      FATAL_ERROR
+        "Pluginval test failed :
+      Vst location : ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION}
+      Pluginval Output : ${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT}")
+  endif()
+
+  message(STATUS "Pluginval test ended sucessfully")
+endfunction()
