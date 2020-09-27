@@ -38,7 +38,7 @@ jobs:
         mkdir build
         cd build
         chmod 777 $GITHUB_WORKSPACE/pluginval/pluginval
-        cmake -DPLUGINVAL_LOCATION="$GITHUB_WORKSPACE/pluginval" -DVST_LOCATION="$GITHUB_WORKSPACE/dexed/Dexed.so" -DTEST_LEVEL=7 ../tst/plugin_verification/
+        # cmake -DPLUGINVAL_LOCATION="$GITHUB_WORKSPACE/pluginval" -DVST_LOCATION="$GITHUB_WORKSPACE/dexed/Dexed.so" -DTEST_LEVEL=7 ../tst/plugin_verification/
     - name: Runs pluginval on Dexed (MacOs)
       if: runner.os	== 'macOS'
       run: |
