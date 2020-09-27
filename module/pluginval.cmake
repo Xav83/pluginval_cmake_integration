@@ -1,8 +1,13 @@
+set(PLUGINVAL_LOCATION
+    ""
+    CACHE PATH "Location of pluginval suggested by the user")
+
 function(pluginval_is_installed output_var)
   unset(PLUGINVAL_EXECUTABLE CACHE)
   find_program(
     PLUGINVAL_EXECUTABLE
-    NAMES pluginval pluginval.exe PATH C:/ProgramData/chocolatey/bin/pluginval
+    NAMES pluginval pluginval.exe
+    HINTS ${PLUGINVAL_LOCATION} C:/ProgramData/chocolatey/bin/pluginval
     DOC "PluginVal executable string")
 
   if(NOT PLUGINVAL_EXECUTABLE)
@@ -171,10 +176,16 @@ function(pluginval_check_plugin)
       FATAL_ERROR "The STRICTNESS_LEVEL must be a value in the range [1, 10].")
   endif()
 
-  if(IS_DIRECTORY ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION})
+  if(NOT DEFINED APPLE AND IS_DIRECTORY ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION})
     message(
       FATAL_ERROR
         "The VST_LOCATION must be a file, but a directory is passed to pluginval_check_plugin (${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION})."
+    )
+  elseif(DEFINED APPLE AND NOT IS_DIRECTORY
+                           ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION})
+    message(
+      FATAL_ERROR
+        "The VST_LOCATION must be a directory on Apple, but a file is passed to pluginval_check_plugin(${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION})"
     )
   endif()
 
@@ -187,14 +198,15 @@ function(pluginval_check_plugin)
 
   execute_process(
     COMMAND
-      pluginval --strictness-level ${PLUGINVAL_CHECK_PLUGIN_STRICTNESS_LEVEL}
-      --validate ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION}
+      ${PLUGINVAL_EXECUTABLE} --strictness-level
+      ${PLUGINVAL_CHECK_PLUGIN_STRICTNESS_LEVEL} --validate
+      ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION}
     RESULT_VARIABLE PLUGINVAL_CHECK_PLUGIN_RESULT
     OUTPUT_VARIABLE PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT)
 
-  string(STRIP ${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT}
+  string(STRIP "${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT}"
                PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT)
-  string(FIND ${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT} "ALL TESTS PASSED"
+  string(FIND "${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT}" "ALL TESTS PASSED"
               ALL_TESTS_PASSED_STRING_POSITION REVERSE)
 
   if(${PLUGINVAL_CHECK_PLUGIN_RESULT} EQUAL 1
@@ -202,8 +214,9 @@ function(pluginval_check_plugin)
     message(
       FATAL_ERROR
         "Pluginval test failed :
+      Command result : ${PLUGINVAL_CHECK_PLUGIN_RESULT}
       Vst location : ${PLUGINVAL_CHECK_PLUGIN_VST_LOCATION}
-      Pluginval Output : ${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT}")
+      Pluginval output : ${PLUGINVAL_CHECK_PLUGIN_STANDARD_OUTPUT}")
   endif()
 
   message(STATUS "Pluginval test ended sucessfully")
