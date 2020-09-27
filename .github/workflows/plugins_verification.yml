@@ -1,0 +1,18 @@
+name: Plugins Verification
+
+on: [push]
+
+jobs:
+  dexed_vst:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dexed and pluginval
+      run: |
+        choco install dexed
+        choco install pluginval
+    - name: Runs pluginval on Dexed
+      run: |
+        mkdir build
+        cd build
+        cmake -DVST_LOCATION="C:/Program Files/Steinberg/VSTPlugins/Dexed.dll" -DTEST_LEVEL=10 ../tst/plugin_verification/
