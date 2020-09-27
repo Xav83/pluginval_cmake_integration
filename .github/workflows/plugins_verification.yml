@@ -4,14 +4,33 @@ on: [push]
 
 jobs:
   dexed_vst:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
-    - name: Install dexed and pluginval
+    - name: Install dexed and pluginval (Windows)
+      if: runner.os     == 'Windows'
       run: |
         choco install dexed
         choco install pluginval
-    - name: Runs pluginval on Dexed
+    - name: Install dexed and pluginval (MacOs)
+      if: runner.os	== 'macOS'
+      run: |
+        curl -L "https://github.com/asb2m10/dexed/releases/download/v0.9.4hf1/dexed-0.9.4-osx.zip" -o dexed.zip
+        unzip dexed.zip -d dexed
+        sudo installer -pkg dexed/dexed-0.9.4-osx.mpkg -target /
+        curl -L "https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_macOS.zip" -o pluginval.zip
+        unzip pluginval.zip -d pluginval
+    - name: Runs pluginval on Dexed (MacOs)
+      if: runner.os	== 'macOS'
+      run: |
+        mkdir build
+        cd build
+        cmake -DPLUGINVAL_LOCATION="$GITHUB_WORKSPACE/pluginval/pluginval.app/Contents/MacOs" -DVST_LOCATION="/Library/Audio/Plug-ins/VST/Dexed.vst" -DTEST_LEVEL=10 ../tst/plugin_verification/
+    - name: Runs pluginval on Dexed (Windows)
+      if: runner.os	== 'Windows'
       run: |
         mkdir build
         cd build
