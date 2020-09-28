@@ -44,7 +44,11 @@ jobs:
       run: |
         mkdir build
         cd build
+        echo "======="
+        ls -l /Library/Audio/Plug-ins/
+        echo "======="
         # cmake -DPLUGINVAL_LOCATION="$GITHUB_WORKSPACE/pluginval/pluginval.app/Contents/MacOs" -DVST_LOCATION="/Library/Audio/Plug-ins/VST/Dexed.vst" -DTEST_LEVEL=10 ../tst/plugin_verification/
+        cmake -DPLUGINVAL_LOCATION="$GITHUB_WORKSPACE/pluginval/pluginval.app/Contents/MacOs" -DVST_LOCATION="/Library/Audio/Plug-ins/VST3/Dexed.vst3" -DTEST_LEVEL=10 ../tst/plugin_verification/
     - name: Runs pluginval on Dexed (Windows)
       if: runner.os	== 'Windows'
       run: |
